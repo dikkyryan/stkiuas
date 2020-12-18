@@ -1,0 +1,28 @@
+SELECT * FROM tfidf; //tampilkan semua; 
+
+SELECT id,SUM(freq) jmlkata FROM tfidf GROUP BY id; //jmlkata;
+
+SELECT a.id,a.kata,a.freq,b.jmlkata,(a.freq/b.jmlkata) tf from
+(SELECT * FROM tfidf) AS a
+JOIN
+(SELECT id,SUM(freq) jmlkata FROM tfidf GROUP BY id) AS b
+ON a.id=b.id; //term frequency=kata dalam satu dokumen;
+
+SELECT COUNT(id) jmldok FROM
+(SELECT * FROM tfidf GROUP BY id) AS c; // jumlah dokumen;
+
+SELECT kata,COUNT(kata) katajmldok FROM tfidf GROUP BY kata; // kata dalam jumlah dokumen;
+
+SELECT *,LOG10(jmldok/katajmldok) idf,tf*(LOG10(jmldok/katajmldok)) tf_idf from
+(SELECT d.id,d.kata,d.freq,d.jmlkata,d.tf,e.katajmldok from
+(SELECT a.id,a.kata,a.freq,b.jmlkata,(a.freq/b.jmlkata) tf from
+(SELECT * FROM tfidf) AS a
+JOIN
+(SELECT id,SUM(freq) jmlkata FROM tfidf GROUP BY id) AS b
+ON a.id=b.id) AS d
+join
+(SELECT kata,COUNT(kata) katajmldok FROM tfidf GROUP BY kata) AS e
+ON d.kata=e.kata) AS f
+join
+(SELECT COUNT(id) jmldok FROM
+(SELECT * FROM tfidf GROUP BY id) AS c) AS g;
